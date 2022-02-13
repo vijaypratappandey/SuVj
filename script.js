@@ -1,360 +1,142 @@
-const qs = document.querySelector.bind(document);
-const easingHeart = mojs.easing.path('M0,100C2.9,86.7,33.6-7.3,46-7.3s15.2,22.7,26,22.7S89,0,100,0');
+const scaling = "fit"; // this will resize to fit inside the screen dimensions
+const width = 1024;
+const height = 768;
+const color = blue.lighten(.6);
+const outerColor = blue.lighten(.6);
+const assets = { font: "Edwardian", src: "ITCEDSCR.TTF" };
+const path = "https://assets.codepen.io/2104200/";
 
-const el = {
-  container: qs('.mo-container'),
+const frame = new Frame(scaling, width, height, color, outerColor, assets, path);
+frame.on("ready", () => {// ES6 Arrow Function - similar to function(){}
+  zog("ready from ZIM Frame"); // logs in console (F12 - choose console)
 
-  i: qs('.lttr--I'),
-  l: qs('.lttr--L'),
-  o: qs('.lttr--O'),
-  v: qs('.lttr--V'),
-  e: qs('.lttr--E'),
-  y: qs('.lttr--Y'),
-  o2: qs('.lttr--O2'),
-  u: qs('.lttr--U'),
+  // often need below - so consider it part of the template
+  const stage = frame.stage;
+  const stageW = frame.width;
+  const stageH = frame.height;
 
-  lineLeft: qs('.line--left'),
-  lineRight: qs('.line--rght'),
+  // REFERENCES for ZIM at https://zimjs.com
+  // see https://zimjs.com/intro.html for an intro example
+  // see https://zimjs.com/learn.html for video and code tutorials
+  // see https://zimjs.com/docs.html for documentation
+  // see https://codepen.io/topic/zim/ for ZIM on CodePen
 
-  colTxt: "#763c8c",
-  colHeart: "#fa4843",
+  // *** NOTE: ZIM Cat defaults to time in seconds
+  // All previous versions, examples, videos, etc. have time in milliseconds
+  // This can be set back with TIME = "milliseconds" but we suggest you give it a try!
+  // There will be a warning in the conslole if your animation is not moving ;-)
 
-  blup: qs('.blup'),
-  blop: qs('.blop'),
-  sound: qs('.sound') };
+  // CODE HERE
 
-
-class Heart extends mojs.CustomShape {
-  getShape() {
-    return '<path d="M50,88.9C25.5,78.2,0.5,54.4,3.8,31.1S41.3,1.8,50,29.9c8.7-28.2,42.8-22.2,46.2,1.2S74.5,78.2,50,88.9z"/>';
-  }
-  getLength() {return 200;}}
-
-mojs.addShape('heart', Heart);
-
-const crtBoom = (delay = 0, x = 0, rd = 46) => {
-  parent = el.container;
-  const crcl = new mojs.Shape({
-    shape: 'circle',
-    fill: 'none',
-    stroke: el.colTxt,
-    strokeWidth: { 5: 0 },
-    radius: { [rd]: [rd + 20] },
-    easing: 'quint.out',
-    duration: 500 / 3,
-    parent,
-    delay,
-    x });
-
-
-  const brst = new mojs.Burst({
-    radius: { [rd + 15]: 110 },
-    angle: 'rand(60, 180)',
-    count: 3,
-    timeline: { delay },
-    parent,
-    x,
-    children: {
-      radius: [5, 3, 7],
-      fill: el.colTxt,
-      scale: { 1: 0, easing: 'quad.in' },
-      pathScale: [.8, null],
-      degreeShift: ['rand(13, 60)', null],
-      duration: 1000 / 3,
-      easing: 'quint.out' } });
-
-
-
-  return [crcl, brst];
-};
-
-const crtLoveTl = () => {
-  const move = 1000;
-  const boom = 200;
-  const easing = 'sin.inOut';
-  const easingBoom = 'sin.in';
-  const easingOut = 'sin.out';
-  const opts = { duration: move, easing, opacity: 1 };
-  const delta = 150;
-
-  return new mojs.Timeline().add([
-  new mojs.Tween({
-    duration: move,
-    onStart: () => {
-      [el.i, el.l, el.o, el.v, el.e, el.y, el.o2, el.u].forEach(el => {
-        el.style.opacity = 1;
-        el.style = 'transform: translate(0px, 0px) rotate(0deg) skew(0deg, 0deg) scale(1, 1); opacity: 1;';
-      });
-    },
-    onComplete: () => {
-      [el.l, el.o, el.v, el.e].forEach(el => el.style.opacity = 0);
-      el.blop.play();
-    } }),
-
-
-  new mojs.Tween({
-    duration: move * 2 + boom,
-    onComplete: () => {
-      [el.y, el.o2].forEach(el => el.style.opacity = 0);
-      el.blop.play();
-    } }),
-
-
-  new mojs.Tween({
-    duration: move * 3 + boom * 2 - delta,
-    onComplete: () => {
-      el.i.style.opacity = 0;
-      el.blop.play();
-    } }),
-
-
-  new mojs.Tween({
-    duration: move * 3 + boom * 2,
-    onComplete: () => {
-      el.u.style.opacity = 0;
-      el.blup.play();
-    } }),
-
-
-  new mojs.Tween({
-    duration: 50,
-    delay: 4050,
-    onUpdate: progress => {
-      [el.i, el.l, el.o, el.v, el.e, el.y, el.o2, el.u].forEach(el => {
-        el.style = `transform: translate(0px, 0px) rotate(0deg) skew(0deg, 0deg) scale(1, 1); opacity: ${1 * progress};`;
-      });
-    },
-    onComplete: () => {
-      [el.i, el.l, el.o, el.v, el.e, el.y, el.o2, el.u].forEach(el => {
-        el.style.opacity = 1;
-        el.style = 'transform: translate(0px, 0px) rotate(0deg) skew(0deg, 0deg) scale(1, 1); opacity: 1;';
-      });
-    } }),
-
-
-  new mojs.Html({
-    ...opts,
-    el: el.lineLeft,
-    x: { 0: 52 } }).
-  then({
-    duration: boom + move,
-    easing,
-    x: { to: 52 + 54 } }).
-  then({
-    duration: boom + move,
-    easing,
-    x: { to: 52 + 54 + 60 } }).
-  then({
-    duration: 150, // 3550
-    easing,
-    x: { to: 52 + 54 + 60 + 10 } }).
-  then({
-    duration: 300 }).
-  then({
-    duration: 350,
-    x: { to: 0 },
-    easing: easingOut }),
-
-
-  new mojs.Html({
-    ...opts,
-    el: el.lineRight,
-    x: { 0: -52 } }).
-  then({
-    duration: boom + move,
-    easing,
-    x: { to: -52 - 54 } }).
-  then({
-    duration: boom + move,
-    easing,
-    x: { to: -52 - 54 - 60 } }).
-  then({
-    duration: 150,
-    easing,
-    x: { to: -52 - 54 - 60 - 10 } }).
-  then({
-    duration: 300 }).
-  then({
-    duration: 350,
-    x: { to: 0 },
-    easing: easingOut }),
-
-
-  new mojs.Html({ // [I] LOVE YOU
-    ...opts,
-    el: el.i,
-    x: { 0: 34 } }).
-  then({
-    duration: boom,
-    easing: easingBoom,
-    x: { to: 34 + 19 } }).
-  then({
-    duration: move,
-    easing,
-    x: { to: 34 + 19 + 40 } }).
-  then({
-    duration: boom,
-    easing: easingBoom,
-    x: { to: 34 + 19 + 40 + 30 } }).
-  then({
-    duration: move,
-    easing,
-    x: { to: 34 + 19 + 40 + 30 + 30 } }),
-
-
-  new mojs.Html({ // I [L]OVE YOU
-    ...opts,
-    el: el.l,
-    x: { 0: 15 } }),
-
-
-  new mojs.Html({ // I L[O]VE YOU
-    ...opts,
-    el: el.o,
-    x: { 0: 11 } }),
-
-
-  new mojs.Html({ // I LO[V]E YOU
-    ...opts,
-    el: el.v,
-    x: { 0: 3 } }),
-
-
-  new mojs.Html({ // I LOV[E] YOU
-    ...opts,
-    el: el.e,
-    x: { 0: -3 } }),
-
-
-  new mojs.Html({ // I LOVE [Y]OU
-    ...opts,
-    el: el.y,
-    x: { 0: -20 } }).
-  then({
-    duration: boom,
-    easing: easingBoom,
-    x: { to: -20 - 33 } }).
-  then({
-    duration: move,
-    easing,
-    x: { to: -20 - 33 - 24 } }),
-
-
-  new mojs.Html({ // I LOVE Y[O]U
-    ...opts,
-    el: el.o2,
-    x: { 0: -27 } }).
-  then({
-    duration: boom,
-    easing: easingBoom,
-    x: { to: -27 - 27 } }).
-  then({
-    duration: move,
-    easing,
-    x: { to: -27 - 27 - 30 } }),
-
-
-  new mojs.Html({ // I LOVE YO[U]
-    ...opts,
-    el: el.u,
-    x: { 0: -32 } }).
-  then({
-    duration: boom,
-    easing: easingBoom,
-    x: { to: -32 - 21 } }).
-  then({
-    duration: move,
-    easing,
-    x: { to: -32 - 21 - 36 } }).
-  then({
-    duration: boom,
-    easing: easingBoom,
-    x: { to: -32 - 21 - 36 - 31 } }).
-  then({
-    duration: move,
-    easing,
-    x: { to: -32 - 21 - 36 - 31 - 27 } }),
-
-
-  new mojs.Shape({
-    parent: el.container,
-    shape: 'heart',
-    delay: move,
-    fill: el.colHeart,
-    x: -64,
-    scale: { 0: 0.95, easing: easingHeart },
-    duration: 500 }).
-  then({
-    x: { to: -62, easing },
-    scale: { to: 0.65, easing },
-    duration: boom + move - 500 }).
-  then({
-    duration: boom - 50,
-    x: { to: -62 + 48 },
-    scale: { to: 0.90 },
-    easing: easingBoom }).
-  then({
-    duration: 125,
-    scale: { to: 0.8 },
-    easing: easingOut }).
-  then({
-    duration: 125,
-    scale: { to: 0.85 },
-    easing: easingOut }).
-  then({
-    duration: move - 200,
-    scale: { to: 0.45 },
-    easing }).
-  then({
-    delay: -75,
-    duration: 150,
-    x: { to: 0 },
-    scale: { to: 0.90 },
-    easing: easingBoom }).
-  then({
-    duration: 125,
-    scale: { to: 0.8 },
-    easing: easingOut }).
-  then({
-    duration: 125, // 3725
-    scale: { to: 0.85 },
-    easing: easingOut }).
-  then({
-    duration: 125 // 3850
-  }).then({
-    duration: 350,
-    scale: { to: 0 },
-    easing: easingOut }),
-
-
-  ...crtBoom(move, -64, 46),
-  ...crtBoom(move * 2 + boom, 18, 34),
-  ...crtBoom(move * 3 + boom * 2 - delta, -64, 34),
-  ...crtBoom(move * 3 + boom * 2, 45, 34)]);
-
-};
-
-const loveTl = crtLoveTl().play();
-setInterval(() => {loveTl.replay();}, 4300);
-
-const volume = 0.2;
-el.blup.volume = volume;
-el.blop.volume = volume;
-
-const toggleSound = () => {
-  let on = true;
-  return () => {
-    if (on) {
-      el.blup.volume = 0.0;
-      el.blop.volume = 0.0;
-      el.sound.classList.add('sound--off');
-    } else
-    {
-      el.blup.volume = volume;
-      el.blop.volume = volume;
-      el.sound.classList.remove('sound--off');
+  // this class was used in a previous app where the arms raised
+  class Person extends Container {
+    constructor(skin = brown, shirt = orange, pants = blue) {
+      super(130, 300); // call container with optional dimensions
+      new Circle(35, skin).center(this).pos(null, 10);
+      new Rectangle(60, 220, pants).center(this).pos(null, 80);
+      this.arm = new Rectangle(30, 100, shirt).reg(30, 0).loc(106, 82, this).rot(-10);
+      this.hand = new Circle(15, skin).center(this.arm).pos(null, this.arm.height - 5).bot();
+      const armDown = new Rectangle(30, 100, shirt).loc(24, 81, this).rot(10);
+      new Circle(15, skin).center(armDown).pos(null, this.arm.height - 5).bot();
+      new Rectangle(80, 140, shirt).center(this).pos(null, 80);
     }
-    on = !on;
-  };
-};
-el.sound.addEventListener('click', toggleSound());
+    raiseArm(degrees = 30, time = 300) {
+      this.arm.animate({ rotation: -degrees }, time);
+    }
+    lowerArm(degrees = 10, time = 300) {
+      this.arm.animate({ rotation: -degrees }, time);
+    }}
+
+  var person1 = new Person().pos(-100, 70, CENTER, CENTER);
+  var person2 = new Person(brown, green, pink).pos(100, 70, CENTER, CENTER);
+
+  var heart = new Blob({
+    interactive: false,
+    color: red,
+    borderColor: purple,
+    points: [[0, -40.7, 0, 0, -57.3, -76.6, 41.8, -80.3, "free"], [100, 0, 0, 0, 23.7, -45.4, -23.7, 45.4, "mirror"], [0, 100, 0, 0, 0, 0, 0, 0, "none"], [-100, 0, 0, 0, 21.9, 48.2, -21.9, -48.2, "mirror"]] });
+
+
+  // Blob points are recorded with the commented out script below
+  var points1 = [[-82.3, -15, 0, 0, 75.4, -0.5, -169.7, 1], [-343.3, -129.5, 0, 0, 67.1, 20.8, -93.2, -28.8], [-418.1, 6.8, 0, 0, -28.1, -30.4, 95.9, 103.9], [-290.1, -323.7, 0, 0, 140.1, -4.6, -112.6, 3.7], [-262.2, -215.4, 0, 0, -84, 12.9, 116.4, -17.9], [165.8, -218.6, 0, 0, -45.8, -162.3, 33.4, 118.4]];
+  var points2 = [[111.9, -37.5, 0, 0, -42.8, -25.8, 60.1, 36.3], [402.1, -31.9, 0, 0, -38.4, -130.1, 29.5, 100.2], [247.8, 28, 0, 0, 36.7, 101.8, -36.4, -100.9], [401.9, -242.4, 0, 0, -7.9, 55.5, 13.4, -94.4], [281.7, -312.5, 0, 0, 45.6, -49.6, -41.8, 45.5], [131.9, -182.2, 0, 0, 58.6, 10.1, -115.4, -19.8], [-162.4, -292, 0, 0, 117.2, -55.8, -44.4, 21.2], [-90.9, -92.7, 0, 0, -183.2, -27, 49.4, 7.3]];
+  var blob1 = new Blob({ points: points1, borderWidth: 3, borderColor: black }).center().mov(0, 70);
+  var blob2 = new Blob({ points: points2, borderWidth: 3, borderColor: purple }).center().mov(0, 70);
+  // // how blob paths are recorded
+  // frame.on("keydown", e=>{
+  // 	if (e.keyCode==32) blob2.recordPoints(true)
+  // })
+  // do not actually have to add blobs in the end but left them in if you want to see them
+  blob1.visible = false;
+  blob2.visible = false;
+
+  function makeHearts() {
+    heart.clone().addTo().sca(.2).alp(0).
+    animate({
+      props: { path: blob1, orient: false, percent: 89, color: purple },
+      time: 10,
+      loop: true }).
+
+    animate({
+      props: { alpha: 1, scale: .5 },
+      time: 1.5,
+      rewind: true,
+      rewindWait: 7,
+      loop: true }).
+
+    wiggle("rotation", 0, 5, 20, .5, 1.5);
+
+    heart.clone().addTo().sca(.2).alp(0).
+    animate({
+      props: { path: blob2, orient: false, percent: 89, color: "violet" },
+      time: 10,
+      loop: true }).
+
+    animate({
+      props: { alpha: 1, scale: .5 },
+      time: 1.5,
+      rewind: true,
+      rewindWait: 7,
+      loop: true }).
+
+    wiggle("rotation", 0, 5, 20, .5, 1.5);
+
+  }
+  interval(1.1, makeHearts, 4, true);
+
+  new Label("Happy Valentine Day, Love!", 45, "Edwardian", red.darken(.3)).pos(0, 65, CENTER, BOTTOM);
+
+
+  // stage.update(); // this is needed to show any changes -- not needed with animate
+
+  // DOCS FOR ITEMS USED
+  // https://zimjs.com/docs.html?item=Frame
+  // https://zimjs.com/docs.html?item=Circle
+  // https://zimjs.com/docs.html?item=Rectangle
+  // https://zimjs.com/docs.html?item=Blob
+  // https://zimjs.com/docs.html?item=Label
+  // https://zimjs.com/docs.html?item=Pane
+  // https://zimjs.com/docs.html?item=TextArea
+  // https://zimjs.com/docs.html?item=animate
+  // https://zimjs.com/docs.html?item=wiggle
+  // https://zimjs.com/docs.html?item=pos
+  // https://zimjs.com/docs.html?item=loc
+  // https://zimjs.com/docs.html?item=mov
+  // https://zimjs.com/docs.html?item=bot
+  // https://zimjs.com/docs.html?item=alp
+  // https://zimjs.com/docs.html?item=rot
+  // https://zimjs.com/docs.html?item=reg
+  // https://zimjs.com/docs.html?item=sca
+  // https://zimjs.com/docs.html?item=addTo
+  // https://zimjs.com/docs.html?item=centerReg
+  // https://zimjs.com/docs.html?item=center
+  // https://zimjs.com/docs.html?item=interval
+  // https://zimjs.com/docs.html?item=lighten
+  // https://zimjs.com/docs.html?item=darken
+  // https://zimjs.com/docs.html?item=zog
+
+  // FOOTER
+  // call remote script to make ZIM icon - you will not need this
+  createIcon();
+
+}); // end of ready
